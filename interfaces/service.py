@@ -6,6 +6,8 @@ import os
 import shutil
 from typing import List, Dict, Tuple
 
+# imagestore
+
 class DBInterface(ABC):
     @abstractmethod
     def connect(self):

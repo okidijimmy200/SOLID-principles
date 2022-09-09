@@ -222,8 +222,8 @@ name = "Person"
 phone = "0787870021"
 age = 26
 
-# phone_book_system.createContact({"name": name, "phone": phone})
-phone_book_system.readContact({"phone": phone})
+phone_book_system.createContact({"name": name, "phone": phone})
+# phone_book_system.readContact({"phone": phone})
 # phone_book_system.updateContact({"phone": phone, "age": age})
 # phone_book_system.deleteContact({"phone": phone})
 phone_book_system.tearDownSystem()
