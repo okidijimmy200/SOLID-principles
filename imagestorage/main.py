@@ -55,8 +55,8 @@ class ImageStorageSystem:
             return False, reason
         return True, reason
 
-database_service = MinioStorage()
-# database_service = AWSStorage()
+# database_service = MinioStorage()
+database_service = AWSStorage()
 
 image_storage_system = ImageStorageSystem(database_service)
 image_storage_system.setUpSystem()
@@ -77,6 +77,6 @@ destinationURL = 'files/AI.jpg'
 
 # image_storage_system.uploadFile({'uri': sourceURI, 'url': destinationURL})
 # image_storage_system.deleteFile(destinationURL)
-# image_storage_system.downloadFile({'uri': sourceURI, 'url': destinationURL})
+image_storage_system.downloadFile({'uri': sourceURI, 'url': destinationURL})
 # image_storage_system.getFileURL(destinationURL)
 

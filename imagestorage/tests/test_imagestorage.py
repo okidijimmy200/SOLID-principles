@@ -1,16 +1,5 @@
-import os
-import sys
+import mock
 import pytest
-from aws import AWSStorage
-from minios import MinioStorage
-from main import ImageStorageSystem
-
-
-@pytest.fixture
-def db_service(getDatabaseService):
-    image_storage_system = ImageStorageSystem(getDatabaseService)
-    image_storage_system.setUpSystem()
-    return image_storage_system
 
 @pytest.fixture
 def db_name(request):
@@ -18,14 +7,16 @@ def db_name(request):
     return service
 
 @pytest.fixture
-def getDatabaseService(db_name):
+@mock.patch('aws.AWSStorage')
+@mock.patch('minios.MinioStorage')
+def cloud(mock_aws, mock_minios, db_name):
     print(db_name)
     if db_name == 'aws':
-        return AWSStorage()
-    else:
-        return MinioStorage()
+        return mock_aws
+    elif db_name == 'minios':
+        return mock_minios
 
-def test_uploadFile(db_service):
+def test_uploadFile(cloud, helpers):
     data = {"uri": "files/AI.jpg", "url": "/output/AI.jpg"}
     data_2 = {"uri": "home/files/AI.jpg", "url": "/output/AI.jpg"}
     test_cases = [
@@ -41,11 +32,13 @@ def test_uploadFile(db_service):
         }
     ]
     for test_case in test_cases:
-        output = db_service.uploadFile(test_case["input"])
+        client, data = helpers.image_storage(cloud=cloud)
+        client.cloud.upload.return_value = test_case["output"]
+        output = client.uploadFile(test_case["input"])
         expected = test_case["output"]
-        assert output, expected
+        assert output == expected
 
-def test_downloadFile(db_service):
+def test_downloadFile(cloud, helpers):
     data = {"uri": "files/AI.jpg", "url": "/output/AI.jpg"}
     data_2 = {"uri": "home/files/AI.jpg", "url": "/output/AI.jpg"}
     test_cases = [
@@ -61,11 +54,13 @@ def test_downloadFile(db_service):
         }
     ]
     for test_case in test_cases:
-        output = db_service.downloadFile(test_case["input"])
+        client, data = helpers.image_storage(cloud=cloud)
+        client.cloud.download.return_value = test_case["output"]
+        output = client.downloadFile(test_case["input"])
         expected = test_case["output"]
-        assert output, expected
+        assert output == expected
 
-def test_deleteFile(db_service):
+def test_deleteFile(cloud, helpers):
     data =  "/output/AI.jpg"
     data_2 =  "home/output/AI.jpg"
     test_cases = [
@@ -81,11 +76,13 @@ def test_deleteFile(db_service):
         }
     ]
     for test_case in test_cases:
-        output = db_service.deleteFile(test_case["input"])
+        client, data = helpers.image_storage(cloud=cloud)
+        client.cloud.delete.return_value = test_case["output"]
+        output = client.deleteFile(test_case["input"])
         expected = test_case["output"]
-        assert output, expected
+        assert output == expected
 
-def test_getFileURL(db_service):
+def test_getFileURL(cloud, helpers):
     data =  "/output/AI.jpg"
     data_2 =  "home/output/AI.jpg"
     test_cases = [
@@ -101,6 +98,8 @@ def test_getFileURL(db_service):
         }
     ]
     for test_case in test_cases:
-        output = db_service.getFileURL(test_case["input"])
+        client, data = helpers.image_storage(cloud=cloud)
+        client.cloud.getFileURL.return_value = test_case["output"]
+        output = client.getFileURL(test_case["input"])
         expected = test_case["output"]
-        assert output, expected
+        assert output == expected

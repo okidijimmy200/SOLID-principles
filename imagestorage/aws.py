@@ -1,10 +1,17 @@
 from cloud_interface import CloudSystemInterface
 import boto3
+import os
 from typing import Tuple
 
 class AWSStorage(CloudSystemInterface):
-    def connect(self):
+
+    def __init__(self) -> None:
+        super().__init__()
         self.s3 = boto3.resource('s3')
+        self.s3_client = boto3.client('s3')
+        self.bucket = 'image-store-1995'
+
+    def connect(self):
         self.s3_client = boto3.client('s3')
         return True
 
@@ -14,8 +21,8 @@ class AWSStorage(CloudSystemInterface):
     def upload(self, sourceURI: str, destinationURL: str) -> Tuple[bool, str]:
         try:
             f = open(f"{sourceURI}", "rb")
-            self.s3.Bucket('image-store-1995').put_object(Key=f'{destinationURL}', Body=f)
-
+            # self.s3.Bucket(self.bucket).put_object(Key=f'{destinationURL}', Body=f)
+            self.s3_client.upload_file(sourceURI, self.bucket, 'AI.jpg')
             reason = f"Data uploaded successfully in aws at {destinationURL}"
             print(reason)
             return True, reason
@@ -32,7 +39,8 @@ class AWSStorage(CloudSystemInterface):
     def download(self, sourceURI: str, destinationURL: str) -> Tuple[bool, str]:
         try:
             with open(f"{sourceURI}", 'wb') as f:
-                self.s3_client.download_fileobj('image-store-1995', 'test.json', f)
+                # self.s3_client.download_fileobj('image-store-1995', 'test.json', f)
+                self.s3_client.download_file(self.bucket, 'AI.jpg', destinationURL)
             # print(response)
             reason = f"Data successfully downloaded from aws at {sourceURI} to {destinationURL}"
             print(reason)
