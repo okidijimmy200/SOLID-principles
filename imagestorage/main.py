@@ -1,6 +1,6 @@
 from cloud_interface import CloudSystemInterface
 from typing import Tuple
-from minios import MinioStorage
+import boto3
 from aws import AWSStorage
 
 class ImageStorageSystem:
@@ -55,8 +55,10 @@ class ImageStorageSystem:
             return False, reason
         return True, reason
 
+boto = boto3.client('s3')
+bucket = 'image-store-1995'
 # database_service = MinioStorage()
-database_service = AWSStorage()
+database_service = AWSStorage(boto, bucket)
 
 image_storage_system = ImageStorageSystem(database_service)
 image_storage_system.setUpSystem()
@@ -77,6 +79,6 @@ destinationURL = 'files/AI.jpg'
 
 # image_storage_system.uploadFile({'uri': sourceURI, 'url': destinationURL})
 # image_storage_system.deleteFile(destinationURL)
-image_storage_system.downloadFile({'uri': sourceURI, 'url': destinationURL})
+# image_storage_system.downloadFile({'uri': sourceURI, 'url': destinationURL})
 # image_storage_system.getFileURL(destinationURL)
 

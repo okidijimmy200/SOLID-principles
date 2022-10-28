@@ -14,6 +14,12 @@ minioClient = Minio(
 
 """Minio Storage"""
 class MinioStorage(CloudSystemInterface):
+
+    def __init__(self, minioClient, bucket) -> None:
+        super().__init__()
+        self.minioClient = minioClient
+        self.bucket = bucket
+
     def connect(self):
         return super().connect()
 
@@ -23,16 +29,16 @@ class MinioStorage(CloudSystemInterface):
     def upload(self, sourceURI: str, destinationURL: str) -> Tuple[bool, str]:
         print(f"Uploading file to minio")
         try:
-            if not minioClient.bucket_exists(BUCKET):
-                minioClient.make_bucket(BUCKET)
+            if not self.minioClient.bucket_exists(self.bucket):
+                self.minioClient.make_bucket(self.bucket)
 
         except Exception as e:
             print("Bucket Exception : {}".format(e))
 
         try:
                 image = sourceURI.split()[-1]
-                minioClient.fput_object(
-                BUCKET, image ,sourceURI
+                self.minioClient.fput_object(
+                self.bucket, image ,sourceURI
             )
                 reason = f"Data uploaded successfully in minio at {destinationURL}"
                 print(reason)
@@ -44,41 +50,52 @@ class MinioStorage(CloudSystemInterface):
                 f"Failed to create data in location {destinationURL}, reason:" 
                 + f"{type(e).__name__} {str(e)}"
             )
+            result = f'Failed to create data in location {destinationURL}'
 
             print(reason)
-            return False, reason
+            return False, result
 
     def delete(self, destinationURL: str) -> Tuple[bool, str]:
-        print("Deleting Object from bucket")
         try:
-            minioClient.remove_object(
-            BUCKET, destinationURL
-        )
-            reason = f"Data successfully removed from minio at {destinationURL}"
-            print(reason)
-            return True, reason
+            objects = self.minioClient.list_objects(self.bucket)
+            if objects:
+                results = self.minioClient.remove_object(
+                self.bucket, destinationURL )
+                print(results)
+                if results:
+                    reason = f"Data successfully removed from minio at {destinationURL}"
+                    print(reason)
+                    return True, reason
+                else:
+                    reason = f"Failed to remove data in location {destinationURL}"
+                    print(reason)
+                    return False, reason
+
 
         except  Exception as e:
             reason = (
                 f"Failed to remove data in location {destinationURL}, reason:" 
                 + f"{type(e).__name__} {str(e)}"
             )
-
+            result = f'Failed to remove data in location {destinationURL}'
             print(reason)
-            return False, reason
+            return False, result
 
     def download(self, sourceURI: str, destinationURL: str) -> Tuple[bool, str]:
         print("Downloading Object from bucket")
         try:
-            response = minioClient.get_object(
-            BUCKET, sourceURI
+            response = self.minioClient.get_object(
+            self.bucket, sourceURI
         )
             data = response.data
             with open(f"{destinationURL}", 'wb') as handler:
-                handler.write(data)
-            reason = f"Data successfully downloaded from minio at {sourceURI} to {destinationURL}"
-            print(reason)
-            return True, reason
+                try:
+                    handler.write(data)
+                    reason = f"Data successfully downloaded from minio at {sourceURI} to {destinationURL}"
+                    print(reason)
+                    return True, reason
+                except (IOError, OSError):
+                    print("Error writing to file")
 
         except  Exception as e:
             reason = (
@@ -91,16 +108,25 @@ class MinioStorage(CloudSystemInterface):
 
     def getFileURL(self, destinationURL: str) -> Tuple[str]:
         try:
-            result = f"http//localhost:9000/{destinationURL}"
-            reason = f"URL minio path for data at {result}"
-            print(reason)
-            return True, reason
+            objects = self.minioClient.list_objects(self.bucket)
+            if objects:
+                result = f"http//localhost:9000/{destinationURL}"
+                reason = f"URL minio path for data at {result}"
+                print(reason)
+                return True, reason
+
+            else:
+                result = f'Failed to locate data in location {destinationURL}'
+
+                print(reason)
+                return False, result
 
         except  Exception as e:
             reason = (
                 f"Failed to locate data in location {destinationURL}, reason:" 
                 + f"{type(e).__name__} {str(e)}"
             )
+            result = f'Failed to locate data in location {destinationURL}'
 
             print(reason)
-            return False, reason
+            return False, result

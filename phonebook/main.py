@@ -1,7 +1,11 @@
 from interface import PhoneBookInterface
 from typing import Dict, Tuple
 from memory import MemorySystem
-# from db import DatabaseSystem
+from db import DatabaseSystem
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+from db import SessionLocal
 
 class PhoneBookSystem:
     def __init__(self, db_service_provider: PhoneBookInterface) -> None:
@@ -70,9 +74,14 @@ class PhoneBookSystem:
         return True, reason
         # print(data)
         # return data
+    def disconnect(self):
+        print("Shutting down system")
+        self.db.disconnect()
+        print("System shut down")
 
-# database_service = DatabaseSystem()
-database_service = MemorySystem()
+session_local = SessionLocal()
+database_service = DatabaseSystem(session_local)
+# database_service = MemorySystem()
 
 phone_book_system = PhoneBookSystem(database_service)
 phone_book_system.setUpSystem()
@@ -84,7 +93,7 @@ name = "Person-456"
 phone = "0788926713.json"
 phone2 = "0782142404.json"
 phone_book_system.createContact({"name": name, "phone": phone})
-# phone_book_system.readContact(phone)
+# phone_book_system.readContact(id)
 # phone_book_system.updateContact({"id": id, "phone": phone2})
 '''for memory system'''
 # phone_book_system.updateContact({"id": id, "phone": name})

@@ -22,12 +22,13 @@ class MemorySystem(PhoneBookInterface):
             return True, reason
 
         except  Exception as e:
-            reason = (
+            result = (
                 f"Failed to create data in location {location}, reason:" 
                 + f"{type(e).__name__} {str(e)}"
             )
+            reason = f"Failed to create data in location {location}"
 
-            print(reason)
+            print(result)
             return False, reason
 
     def read(self, location: str) -> Tuple[bool, str, Dict[str, str]]:
@@ -37,8 +38,9 @@ class MemorySystem(PhoneBookInterface):
             reason =f"Data read from {location}"
             return True, reason, data
         except BaseException as err:
-            reason = (f"Unexpected {err=}, {type(err)=}")
-            print(reason)
+            result = (f"Unexpected {err=}, {type(err)=}")
+            reason = f'Failed to read data from location {location}'
+            print(result)
             data= None
             # return False, data, reason
             return False, reason, data

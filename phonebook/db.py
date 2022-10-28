@@ -1,3 +1,4 @@
+from cgitb import reset
 from typing import Tuple
 from sqlalchemy import create_engine   
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,7 +8,7 @@ from interface import PhoneBookInterface
 
 
 # connect to mysql
-SQLALCHAMY_DATABASE_URL = 'mysql://root:j4e4s4u4s.@localhost:3306/phonebook'
+SQLALCHAMY_DATABASE_URL = 'mysql://root:j4e4s4u4s.@localhost:3306/imagestore'
 
 
 engine = create_engine(SQLALCHAMY_DATABASE_URL)
@@ -24,50 +25,53 @@ class PhoneBook(Base):
     def __repr__(self):
         return 'id: {}, body: {}'.format(self.id, self.body)
 
+
 Base.metadata.create_all(engine)
 
 class DatabaseSystem(PhoneBookInterface):
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.db = SessionLocal()
+    def __init__(self, SessionLocal) -> None:
+        self.db = SessionLocal
         # yield self.db
 
     def connect(self):
-        print("-Connecting to MYSQL Database")
+        ...
 
     def disconnect(self):
-        print("-Disconnecting from MYSQL Database")
-
+        ...
+        
     def create(self, location: str, data: str) -> Tuple[bool, str]:
         try:
+            # self.db = self.connect()
             new_data = PhoneBook(body=data)
             self.db.add(new_data)
             self.db.commit()
             self.db.refresh(new_data)
-            reason = f"Data stored succesfully at {location}"
+            reason = f"Data created successfully in location {location}"
             print(reason)
             return (True, reason)
         except Exception as e:
-            reason = (
+            result = (
                 f"-Failed to create data in location {location}, reason: "
                 + f"{type(e).__name__} {str(e)}"
             )
-            print(reason)
+            reason = f'Failed to create data in location {location}'
+            print(result)
             return False, reason
 
     def read(self, location: str) -> Tuple[bool, str]:
         try:
             new_data = self.db.query(PhoneBook).all()
-            reason = f"Data from MYSQL database at {location}"
-            print(reason, new_data)
+            reason = f"Data read from {location}"
+            # print(reason, new_data)
             return (True, reason, new_data)
 
         except Exception as e:
-            reason = (
+            result = (
                 f"-Failed to create data in location {location}, reason: "
                 + f"{type(e).__name__} {str(e)}"
             )
+            reason = f'Failed to read data from location {location}'
             data = ''
             print(reason)
             return False, data, reason
@@ -86,27 +90,29 @@ class DatabaseSystem(PhoneBookInterface):
 
         except Exception as e:
             reason = (
-                f"-Failed to create data in location {location}, reason: "
+                f"-Failed to update data in location {location}, reason: "
                 + f"{type(e).__name__} {str(e)}"
             )
+            result = f'-Failed to update data in location {location}'
             data = ''
             print(reason)
-            return False, reason, data
+            return False, result, data
 
     def delete(self, location: str) -> Tuple[bool, str]:
         try:
             new_data = self.db.query(PhoneBook).filter(PhoneBook.id == location).delete()
             if not new_data:
-                return {'detail': f'Data with the id {id} is not available'}
+                return f'Data with the id {location} is not available'
 
             reason = f"Data with id {location} has been deleted from database"
             print(True, reason)
-            return (True, reason)
+            return True, reason
 
         except Exception as e:
             reason = (
-                f"-Failed to create data in location {location}, reason: "
+                f"-Failed to delete data in location {location}, reason: "
                 + f"{type(e).__name__} {str(e)}"
             )
+            result = f"Failed to delete data in location {location}"
             print(reason)
-            return False, reason
+            return False, result

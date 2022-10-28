@@ -23,3 +23,8 @@ class Helpers:
 @pytest.fixture
 def helpers():
     return Helpers
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--db", action="store", default="inmemory"
+    )
