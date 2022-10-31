@@ -1,3 +1,6 @@
+
+![Tests](https://github.com/okidijimmy200/imageStore/actions/workflows/build.yaml/badge.svg)
+
 ImageStorage:
 Designed a interface to our ImageStorage system that performs operations of upload,
 download, getFileURL, delete operations.
