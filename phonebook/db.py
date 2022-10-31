@@ -25,7 +25,7 @@ class PhoneBook(Base):
         return 'id: {}, body: {}'.format(self.id, self.body)
 
 
-Base.metadata.create_all(engine)
+# Base.metadata.create_all(engine)
 
 class DatabaseSystem(PhoneBookInterface):
 
