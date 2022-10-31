@@ -28,7 +28,6 @@ jobs:
         sudo apt-get update -y
         sudo apt install mysql-server
         sudo service mysql start
-        mysql -e "SET PASSWORD = 'j4e4s4u4s.';" -e "FLUSH PRIVILEGES;"
       working-directory: phonebook
     - name: Install dependencies
       run: |
