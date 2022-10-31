@@ -28,7 +28,7 @@ jobs:
         sudo apt-get update -y
         sudo apt install mysql-server
         sudo service mysql start
-        sudo mysql -u root -e ALTER USER 'root'@'localhost' IDENTIFIED BY 'j4e4s4u4s.' -e flush privileges -e exit;
+        mysql -e "SET PASSWORD = 'j4e4s4u4s.';"
       working-directory: phonebook
     - name: Install dependencies
       run: |
