@@ -27,6 +27,7 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt install mysql-server
+        sudo service mysql start
       working-directory: phonebook
     - name: Install dependencies
       run: |
