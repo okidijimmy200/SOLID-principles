@@ -63,3 +63,11 @@ jobs:
       run: |
         pytest
       working-directory: phonebook
+    - name: pytest cov in imagestorage
+      run: |
+        pytest --cov
+      working-directory: imagestorage
+    - name: pytest cov in phonebook
+      run: |
+        pytest --cov
+      working-directory: phonebook
