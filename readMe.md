@@ -1,3 +1,4 @@
+[![Python application](https://github.com/okidijimmy200/imageStore/actions/workflows/python-app.yml/badge.svg)](https://github.com/okidijimmy200/imageStore/actions/workflows/python-app.yml)
 Implementation of design patterns in python:
 1. Implementation of singleton design pattern
 2. Class factory design pattern.
